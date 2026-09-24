@@ -1,0 +1,66 @@
+name: 'Orbit Governance Evidence'
+description: >
+  Call hosted Orbit MCP for capability context, evaluate changed files via the
+  customer AI gateway, and submit per-control evidence (never the full codebase).
+author: 'aahamed-dm'
+
+inputs:
+  orbit_governance_key:
+    description: 'Orbit governance API key (Bearer). Stored as a repo secret.'
+    required: true
+  ai_gateway_url:
+    description: 'Customer LiteLLM / OpenAI-compatible gateway base URL (with or without /v1).'
+    required: true
+  ai_gateway_api_key:
+    description: 'API key for the customer AI gateway.'
+    required: true
+  ai_gateway_model:
+    description: 'Model id as accepted by the customer AI gateway.'
+    required: true
+  fail_on_required:
+    description: 'If true, fail the job when any Required control has passed=false.'
+    required: false
+    default: 'true'
+  source:
+    description: 'Evidence source: ci | local'
+    required: false
+    default: 'ci'
+
+outputs:
+  controls_submitted:
+    description: 'Number of controls submitted in this run.'
+    value: ${{ steps.scan.outputs.controls_submitted }}
+  required_failed:
+    description: 'Number of Required controls that failed.'
+    value: ${{ steps.scan.outputs.required_failed }}
+  tier:
+    description: 'Tier returned by capability context.'
+    value: ${{ steps.scan.outputs.tier }}
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install Orbit governance action
+      shell: bash
+      run: python -m pip install --upgrade pip && python -m pip install "${{ github.action_path }}"
+
+    - name: Run Orbit governance evidence scan
+      id: scan
+      shell: bash
+      env:
+        INPUT_ORBIT_GOVERNANCE_KEY: ${{ inputs.orbit_governance_key }}
+        INPUT_AI_GATEWAY_URL: ${{ inputs.ai_gateway_url }}
+        INPUT_AI_GATEWAY_API_KEY: ${{ inputs.ai_gateway_api_key }}
+        INPUT_AI_GATEWAY_MODEL: ${{ inputs.ai_gateway_model }}
+        INPUT_FAIL_ON_REQUIRED: ${{ inputs.fail_on_required }}
+        INPUT_SOURCE: ${{ inputs.source }}
+      run: python -m orbit_governance_action
+
+branding:
+  icon: 'shield'
+  color: 'blue'

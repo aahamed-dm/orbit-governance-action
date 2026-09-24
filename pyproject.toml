@@ -1,0 +1,39 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "orbit-governance-action"
+version = "0.3.0"
+description = "Orbit AI Governance evidence GitHub Action (composite + Python)"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Proprietary" }
+authors = [{ name = "DeepModel" }]
+dependencies = [
+  "httpx>=0.27,<1",
+  "pydantic>=2.7,<3",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "respx>=0.21",
+]
+
+[project.scripts]
+orbit-governance-action = "orbit_governance_action.__main__:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/orbit_governance_action"]
+
+[tool.hatch.build.targets.wheel.sources]
+"src/orbit_governance_action" = "orbit_governance_action"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
