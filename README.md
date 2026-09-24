@@ -47,7 +47,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Orbit governance scan
-        uses: aahamed-dm/orbit-governance-action@v1
+        uses: aahamed-dm/orbit-governance-action@master
         with:
           orbit_governance_key: ${{ secrets.ORBIT_GOVERNANCE_KEY }}
           ai_gateway_url: ${{ secrets.AI_GATEWAY_URL }}
@@ -61,7 +61,7 @@ jobs:
 | Main + develop | `[main, develop]` |
 | Every branch | `['**']` |
 
-Pin `@v1` (floating major) or an exact tag like `@v0.3.0`.
+Pin `@master` until you publish tags; then prefer `@v1` (floating major) or an exact tag like `@v0.3.0`.
 
 ## Inputs
 
