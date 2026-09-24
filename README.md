@@ -14,6 +14,10 @@ Remote: https://github.com/aahamed-dm/orbit-governance-action
 
 ## Install in an agent repo
 
+1. Create **`.github/workflows/orbit-governance.yml`** at the root of the agent repo (on the default branch).
+2. Add the four secrets below (Settings → Secrets and variables → Actions).
+3. Edit the `branches:` lists in the YAML to choose which branches trigger the scan — **not** a secret.
+
 Repo secrets:
 
 | Secret | Purpose |
@@ -28,8 +32,12 @@ name: Orbit governance evidence
 
 on:
   push:
+    # Customer: list branches that should scan on push. Use ['**'] for every branch.
+    branches: [main]
   pull_request:
-  workflow_dispatch:
+    # Customer: PRs whose *base* branch is in this list (e.g. PRs into main).
+    branches: [main]
+  workflow_dispatch: # optional: run manually from the Actions tab
 
 jobs:
   evidence:
@@ -46,6 +54,12 @@ jobs:
           ai_gateway_api_key: ${{ secrets.AI_GATEWAY_API_KEY }}
           ai_gateway_model: ${{ secrets.AI_GATEWAY_MODEL }}
 ```
+
+| Goal | `branches:` value |
+|------|-------------------|
+| Default / production only | `[main]` or `[master]` |
+| Main + develop | `[main, develop]` |
+| Every branch | `['**']` |
 
 Pin `@v1` (floating major) or an exact tag like `@v0.3.0`.
 
