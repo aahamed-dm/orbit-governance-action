@@ -1,21 +1,12 @@
 name: 'Orbit Governance Evidence'
 description: >
-  Call hosted Orbit MCP for capability context, evaluate changed files via the
-  customer AI gateway, and submit per-control evidence (never the full codebase).
+  Collect capped changed files and call hosted Orbit MCP validate_changed_files.
+  LLM evaluation and customer control lookup run in Orbit API (not in this Action).
 author: 'aahamed-dm'
 
 inputs:
   orbit_governance_key:
     description: 'Orbit governance API key (Bearer). Stored as a repo secret.'
-    required: true
-  ai_gateway_url:
-    description: 'Customer LiteLLM / OpenAI-compatible gateway base URL (with or without /v1).'
-    required: true
-  ai_gateway_api_key:
-    description: 'API key for the customer AI gateway.'
-    required: true
-  ai_gateway_model:
-    description: 'Model id as accepted by the customer AI gateway.'
     required: true
   fail_on_required:
     description: 'If true, fail the job when any Required control has passed=false.'
@@ -27,15 +18,21 @@ inputs:
     default: 'ci'
 
 outputs:
-  controls_submitted:
-    description: 'Number of controls submitted in this run.'
-    value: ${{ steps.scan.outputs.controls_submitted }}
+  controls_evaluated:
+    description: 'Number of controls evaluated in this run.'
+    value: ${{ steps.scan.outputs.controls_evaluated }}
   required_failed:
     description: 'Number of Required controls that failed.'
     value: ${{ steps.scan.outputs.required_failed }}
   tier:
-    description: 'Tier returned by capability context.'
+    description: 'Tier returned by Orbit validation.'
     value: ${{ steps.scan.outputs.tier }}
+  results:
+    description: 'JSON array of per-control results (passed + findings).'
+    value: ${{ steps.scan.outputs.results }}
+  raw_llm_output:
+    description: 'Raw LLM JSON from Orbit (same payload saved server-side).'
+    value: ${{ steps.scan.outputs.raw_llm_output }}
 
 runs:
   using: composite
@@ -54,9 +51,6 @@ runs:
       shell: bash
       env:
         INPUT_ORBIT_GOVERNANCE_KEY: ${{ inputs.orbit_governance_key }}
-        INPUT_AI_GATEWAY_URL: ${{ inputs.ai_gateway_url }}
-        INPUT_AI_GATEWAY_API_KEY: ${{ inputs.ai_gateway_api_key }}
-        INPUT_AI_GATEWAY_MODEL: ${{ inputs.ai_gateway_model }}
         INPUT_FAIL_ON_REQUIRED: ${{ inputs.fail_on_required }}
         INPUT_SOURCE: ${{ inputs.source }}
       run: python -m orbit_governance_action

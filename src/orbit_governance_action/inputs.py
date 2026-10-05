@@ -28,9 +28,6 @@ def _parse_bool(raw: str, default: bool) -> bool:
 
 def read_run_options() -> RunOptions:
     orbit_governance_key = _require_env("INPUT_ORBIT_GOVERNANCE_KEY")
-    ai_gateway_url = _require_env("INPUT_AI_GATEWAY_URL")
-    ai_gateway_api_key = _require_env("INPUT_AI_GATEWAY_API_KEY")
-    ai_gateway_model = _require_env("INPUT_AI_GATEWAY_MODEL")
     fail_on_required = _parse_bool(os.environ.get("INPUT_FAIL_ON_REQUIRED", "true"), True)
     source = (os.environ.get("INPUT_SOURCE") or "ci").strip().lower()
     commit_sha = (os.environ.get("GITHUB_SHA") or "").strip()
@@ -45,9 +42,6 @@ def read_run_options() -> RunOptions:
     return RunOptions(
         orbit_mcp_url=ORBIT_MCP_URL,
         orbit_governance_key=orbit_governance_key,
-        ai_gateway_url=ai_gateway_url,
-        ai_gateway_api_key=ai_gateway_api_key,
-        ai_gateway_model=ai_gateway_model,
         fail_on_required=fail_on_required,
         source=source,
         commit_sha=commit_sha,

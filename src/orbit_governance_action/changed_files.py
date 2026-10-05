@@ -202,15 +202,3 @@ def collect_changed_files(
         base_ref=base_ref,
         head_ref=head_ref,
     )
-
-
-def format_changed_files_for_prompt(files: list[ChangedFile]) -> str:
-    if not files:
-        return "(no textual file changes detected in this event range)"
-    parts: list[str] = []
-    for file in files:
-        marker = " (truncated)" if file.truncated else ""
-        parts.append(
-            f"### FILE: {file.path}{marker}\n```\n{file.content}\n```"
-        )
-    return "\n\n".join(parts)
